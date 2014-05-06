@@ -2,9 +2,8 @@
 
 var net = require('net');
 var httpreq = require('httpreq');
-var sprintf = require('sprintf').sprintf;
 
-var controller = require('camera-controller');
+var controller = require('panasonic-camera-controller');
 
 var cam1 = new controller.Camera('192.168.0.12');
 var cam2 = new controller.Camera('192.168.0.15');
