@@ -55,7 +55,7 @@ io.sockets.on('connection', function (socket) {
             console.log(res);
         });
 
-        //respond immediatly:
+        //respond immediately:
         socketCallback();
     });
 });

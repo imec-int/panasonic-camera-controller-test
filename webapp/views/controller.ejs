@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <title><%= title %></title>
     <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
     <link rel='stylesheet' href='/stylesheets/controller.css' />
@@ -12,8 +13,8 @@
   <body>
     <h1><%= title %></h1>
     <p>Welcome to <%= title %></p>
-    <button class="btn btn-primary preset" data-preset="0">Preset 1</button>
-    <button class="btn btn-primary preset" data-preset="1">Preset 2</button>
-    <button class="btn btn-primary preset" data-preset="2">Preset 3</button>
+    <% for(var i=1; i<=5; i++) {%>
+      <button class="btn btn-primary preset" data-preset="<%= i %>">Preset <%= i %></button>
+    <% } %>
   </body>
 </html>
