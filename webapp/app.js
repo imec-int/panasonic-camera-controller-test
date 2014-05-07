@@ -38,6 +38,10 @@ app.get('/', function(req, res) {
     res.render('index', { title: 'Panasonic Camera Controller' });
 });
 
+app.get('/3d', function(req, res) {
+    res.render('3d', { title: 'Panasonic Camera Controller' });
+});
+
 
 io.sockets.on('connection', function (socket) {
     console.log('[' + socket.handshake.address.address + '] user connected');
