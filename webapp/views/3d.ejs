@@ -89,7 +89,7 @@ if (window.location.protocol==='file:') {
         <span style="
         bottom: 0px;
         left: 70px;
-    ">Front</span>
+    " class="activeCam">Front</span>
         <span style="
         top: 50px;
         right: 0px;
@@ -100,6 +100,52 @@ if (window.location.protocol==='file:') {
         <span style="
         left: 30px;
     ">Back L</span>
+  </div>
+  <div id="camInfo">
+    <section class="">
+      <table>
+        <thead>
+          <tr><th></th>
+          <th style="color: rgba(220, 30, 60, 0.8);">X</th>
+          <th style="color: rgba(31, 182, 50, 0.8);">Y</th>
+          <th style="color: rgba(48, 72, 242, 0.8);">Z</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td>Translation</td>
+            <td>
+              <input id="translate_0" type="spinner" step="0.2"tabindex="100" class="camInfoInput">
+            </td>
+            <td>
+              <input id="translate_1" type="spinner" step="0.2"class="camInfoInput">
+            </td>
+            <td>
+              <input id="translate_2" type="spinner" step="0.2"class="camInfoInput">
+            </td>
+          </tr>
+
+          <tr>
+            <td>Rotation</td>
+            <td>
+              <input id="rotate_0" type="spinner" step="0.2"tabindex="100" class="camInfoInput">
+            </td>
+            <td>
+              <input id="rotate_1" type="spinner" step="0.2"class="camInfoInput">
+            </td>
+            <td>
+              <input id="rotate_2" type="spinner" step="0.2"class="camInfoInput">
+            </td>
+          </tr>
+
+          <tr>
+            <td>Zoom</td>
+            <td>
+              <input id="zoom_0" type="spinner" step="0.2"tabindex="100" class="camInfoInput">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
   </div>
 </body>
 

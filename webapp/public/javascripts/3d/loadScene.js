@@ -4,6 +4,7 @@ require([
 	'goo/entities/systems/HtmlSystem',
 	'goo/timelinepack/TimelineSystem',
 	'goo/loaders/DynamicLoader',
+	'goo/math/MathUtils',
 
 	'/javascripts/3d/CanvasWrapper.js',
 	'/javascripts/3d/checkBrowser.js',
@@ -18,6 +19,7 @@ require([
 	HtmlSystem,
 	TimelineSystem,
 	DynamicLoader,
+	MathUtils,
 	CanvasWrapper,
 	checkBrowser
 ) {
@@ -34,8 +36,11 @@ require([
 			camController["Left"] = goo.world.by.name('Cam_Left').first();
 			console.log("Cams loaded");
 			console.log(camController);
-			console.log(camController["Front"].scriptComponent.scripts[0].parameters.speed);
+			// console.log(camController["Front"].scriptComponent.scripts[0].parameters.speed);
 
+			// console.log(camController["Front"].getRotation().data);
+			showCameraInfo(camController["Front"]);
+			activeCamId = 'Front';
 			/*
 			To get a hold of entities, one can use the World's selection functions:
 			var allEntities = gooRunner.world.getEntities();                  // all
@@ -156,16 +161,36 @@ require([
 		console.log("initEvents");
 		$("#camButtons>span").click(function(){
 			changeCam($(this).html());
+			$("#camButtons span").removeClass("activeCam");
+			$(this).addClass("activeCam");
+		});
+		$(document).mouseup(function(){
+			showCameraInfo(camController[activeCamId]);
 		});
 	}
 
 	function changeCam(e){
 		//console.log(camController[e]);
+		activeCamId = e;
 		camController[e].setAsMainCamera();
+		showCameraInfo(camController[e]);
+	}
+
+	function showCameraInfo(cam){
+		for (var i = 0; i < 3; i++) {
+				$('#translate_'+i).val(cam.getTranslation().data[i].toFixed(2));
+		};
+		//rotate
+		for (var i = 0; i < 3; i++) {
+			$('#rotate_'+i).val(MathUtils.degFromRad(cam.getRotation().data[i]).toFixed(2)) ;
+		};
+		//Zoom
+		$('#zoom_0').val(cam.cameraComponent.camera.fov);
 	}
 
 	var cams = [null];
 	var camController = {};
+	var activeCamId = '';
 
 	init();
 	initEvents();
