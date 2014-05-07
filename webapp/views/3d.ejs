@@ -1,15 +1,106 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title><%= title %></title>
-    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
-    <script type="text/javascript" src="/vendor/jquery-1.11.0.min.js"></script>
-    <script type="text/javascript" src="/vendor/fastclick.js"></script>
-    <script type="text/javascript" src="/javascripts/index.js"></script>
-  </head>
-  <body>
-    <h1>3D Mediagoo interface</h1>
-  </body>
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1">
+<title>R.A.M.P Studio | Goo Create</title>
+<script>
+// If you try to load a scene without a server, you're gonna have a bad time
+if (window.location.protocol==='file:') {
+  alert('You need to run this webpage on a server. Check the code for links and details.');
+  /*
+
+  Loading scenes uses AJAX requests, which require that the webpage is accessed via http. Setting up
+  a web server is not very complicated, and there are lots of free options. Here are some suggestions
+  that will do the job and do it well, but there are lots of other options.
+
+  - Windows
+
+  There's Apache (http://httpd.apache.org/docs/current/platform/windows.html)
+  There's nginx (http://nginx.org/en/docs/windows.html)
+  And for the truly lightweight, there's mongoose (https://code.google.com/p/mongoose/)
+
+  - Linux
+  Most distributions have neat packages for Apache (http://httpd.apache.org/) and nginx
+  (http://nginx.org/en/docs/windows.html) and about a gazillion other options that didn't
+  fit in here.
+  One option is calling 'python -m SimpleHTTPServer' inside the unpacked folder if you have python installed.
+
+
+  - Mac OS X
+
+  Most Mac users will have Apache web server bundled with the OS.
+  Read this to get started: http://osxdaily.com/2012/09/02/start-apache-web-server-mac-os-x/
+
+  */
+}
+</script>
+
+<!-- disable native mobile pinch-to-zoom, replacing with the Goo Engine zoom -->
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+
+<meta property="og:image" content="http://goote.ch/exports/6165a40598eb4a4ca963c950c150458c/template.zip/res/e601c85d0884d1c341a8dd044d7b3d827abeb66e.png">
+
+
+
+<meta property="og:description" content="3D Q Studio">
+
+
+
+<meta property="og:url" content="http://goote.ch/exports/6165a40598eb4a4ca963c950c150458c/template.zip"/>
+
+<meta property="og:title" content="R.A.M.P Studio"/>
+<meta property="og:updated_time" content="2014-05-05T09:37:58.415917+00:00"/>
+<meta property="og:site_name" content="Goo Create"/>
+<meta property="og:type" content="website"/>
+
+<link rel="stylesheet" type="text/css" href="/stylesheets/3d.css">
+
+<script src="/vendor/Tween.js"></script>
+<script src="/vendor/jquery-1.10.2.min.js"></script>
+<script src="/vendor/requireLib.js"></script>
+<script src="//code.gooengine.com/0.9.8/lib/goo.js"></script>
+<script src="//code.gooengine.com/0.9.8/lib/fsmpack.js"></script>
+<script src="//code.gooengine.com/0.9.8/lib/quadpack.js"></script>
+<script src="//code.gooengine.com/0.9.8/lib/timelinepack.js"></script>
+<script src="/javascripts/3d/loadScene.js"></script>
+
+
+</head>
+
+<body>
+  <div id="loading-overlay">
+    <div id="loading-message">
+      <h2>Loading project</h2>
+      <div id="progress-bar">
+        <div id="progress"></div>
+      </div>
+    </div>
+  </div>
+  <div id="canvas-outer-wrapper">
+    <div id="canvas-inner-wrapper">
+
+    </div>
+  </div>
+  <div id="camButtons">
+    <span style="
+        top: 50px;
+    ">Left</span>
+        <span style="
+        bottom: 0px;
+        left: 70px;
+    ">Front</span>
+        <span style="
+        top: 50px;
+        right: 0px;
+    ">Right</span>
+        <span style="
+        right: 30px;
+    ">Back R</span>
+        <span style="
+        left: 30px;
+    ">Back L</span>
+  </div>
+</body>
+
 </html>
