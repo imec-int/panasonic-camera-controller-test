@@ -1,4 +1,4 @@
-var App = function (options){
+var ControllerApp = function (options){
 
 	var socket = null;
 
@@ -50,7 +50,7 @@ var App = function (options){
 
 
 $(function(){
-	var app = new App();
+	var app = new ControllerApp();
 	app.init();
 });
 

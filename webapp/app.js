@@ -35,11 +35,11 @@ io.set('log level', 0);
 
 
 app.get('/', function(req, res) {
-    res.render('index', { title: 'Panasonic Camera Controller' });
+    res.render('controller', { title: 'Panasonic Camera Controller' });
 });
 
 app.get('/3d', function(req, res) {
-    res.render('3d', { title: 'Panasonic Camera Controller' });
+    res.render('3d', { title: '3D Studio' });
 });
 
 
