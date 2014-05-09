@@ -25,6 +25,8 @@ require([
 ) {
 	'use strict';
 
+	var socket;
+
 	function setup(goo, loader) {
 			// Application code goes here!
 			// gooRunner.world.by.name('Cam_Left').first().setAsMainCamera();
@@ -79,7 +81,28 @@ require([
 			alert('Failed to load project: ' + e);
 		});
 
+		initSocket();
 	}
+
+	function initSocket () {
+		if(socket) return; // already initialized
+
+		socket = io.connect(window.location.hostname);
+
+		// some debugging statements concerning socket.io
+		socket.on('reconnecting', function(seconds){
+			console.log('reconnecting in ' + seconds + ' seconds');
+		});
+		socket.on('reconnect', function(){
+			console.log('reconnected');
+		});
+		socket.on('reconnect_failed', function(){
+			console.log('failed to reconnect');
+		});
+		socket.on('connect', function() {
+			console.log('socket connected');
+		});
+	};
 
 
 	function initGoo() {
@@ -177,6 +200,14 @@ require([
 	}
 
 	function showCameraInfo(cam){
+		var pantilt = {
+			tilt: MathUtils.degFromRad(cam.getRotation().data[0]),
+			pan: MathUtils.degFromRad(cam.getRotation().data[1])
+		};
+		console.log(pantilt);
+		socket.emit('pantilt.absolute', pantilt);
+
+
 		for (var i = 0; i < 3; i++) {
 				$('#translate_'+i).val(cam.getTranslation().data[i].toFixed(2));
 		};
