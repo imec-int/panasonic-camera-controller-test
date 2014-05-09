@@ -29,35 +29,35 @@ html
         .col-sm-offset-2.col-sm-10
           button.btn.btn-default(type='submit') Set Camera position
 
+
     h2 Auto generated controls
-    form#commands.form-horizontal(role='form')
     each command in commands
-      h4 #{command.data.item}
-      if command.html.control.enabled
-        h5 control
-        each inputfield in command.html.control.inputfields
-          label.col-sm-2.control-label(for='tilt') #{inputfield.name}
-          .col-sm-10
-            if inputfield.values.type == 'range'
-              input.form-control(type='text')
-            else
-              select.form-control
-                each valuetext, value in inputfield.values
-                  option(value="#{value}") #{valuetext}
-        button.btn.btn-success Set
+      form.autocommand.form-horizontal(data-item="#{command.data.item}", role='form')
+        h4 #{command.data.item}
+        if command.html.control.enabled
+          h5 control
+          each inputfield in command.html.control.inputfields
+            label.col-sm-2.control-label(for='tilt') #{inputfield.name}
+            .col-sm-10
+              if inputfield.values.type == 'range'
+                input.form-control(data-controlid="#{inputfield.id}", type='text')
+              else
+                select.form-control(data-controlid="#{inputfield.id}")
+                  each valuetext, value in inputfield.values
+                    option(value="#{value}") #{valuetext}
+          button.set.btn.btn-success Set
 
+        if command.html.confirmation.enabled
+          button.confirm.btn.btn-info Confirm
 
-      if command.html.confirmation.enabled
-        button.confirm.btn.btn-info Confirm
-
-      if command.html.outputfields
-        h5 response
-        each outputfield in command.html.outputfields
-          label.col-sm-2.control-label(for='tilt') #{outputfield.name}
-          .col-sm-10
-            input.form-control(id="#{outputfield.id}", type='number')
-      br
-      br
-      hr
+        if command.html.outputfields
+          h5 response
+          each outputfield in command.html.outputfields
+            label.col-sm-2.control-label(for='tilt') #{outputfield.name}
+            .col-sm-10
+              input.outputfield.form-control(data-outputid="#{outputfield.id}", type='text', disabled="disabled")
+        br
+        br
+        hr
 
 

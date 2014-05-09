@@ -31,8 +31,6 @@ var ControllerApp = function (options){
 	var addHandlers = function () {
 		$('.preset').click( onPresetClick );
 
-		pantiltabsolute
-
 		$("#pantiltabsolute").submit(function(e){
 			e.preventDefault();
 			var pan = $("#pantiltabsolute #pan").val();
@@ -40,6 +38,12 @@ var ControllerApp = function (options){
 
 			socket.emit('pantilt.absolute', {pan: pan, tilt: tilt});
 		});
+
+		$("form").submit(function(e){
+			e.preventDefault();
+		});
+
+		$(".set").click( onSetClick );
 	};
 
 	var onPresetClick = function (event){
@@ -48,6 +52,35 @@ var ControllerApp = function (options){
 			console.log(data);
 		});
 	};
+
+	var onSetClick = function (event) {
+		var form = $(this).closest("form");
+		var item = form.attr('data-item');
+
+		// gather all inputs:
+		var command = {
+			item: item,
+			inputs: {}
+		};
+		form.find(":input").each(function(){
+			var id = $(this).attr('data-controlid');
+			var value = $(this).val();
+
+			if(id && value != ""){
+				command.inputs[id] = value;
+			}
+		});
+
+		socket.emit('command.control', command, function (data) {
+			console.log(data);
+			for(var key in data){
+				var value = data[key];
+				var outputfield = form.find('[data-outputid="'+key+'"]');
+				outputfield.val( value.code_text + ' ('+value.code+')' );
+			}
+		});
+	};
+
 
 	return {
 		init: init
