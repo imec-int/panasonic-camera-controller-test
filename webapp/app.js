@@ -1,120 +1,129 @@
-var http = require('http');
+#!/usr/bin/env node
+
+var http = require('http')
 var express = require('express');
 var path = require('path');
-var favicon = require('static-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
 var socketio = require('socket.io');
 var net = require('net');
-var controller = require('panasonic-camera-controller');
 var _ = require('underscore');
 var util = require('util')
 
-
+var controller = require('panasonic-camera-controller');
 var cam1 = new controller.Camera('192.168.0.12');
 var cam2 = new controller.Camera('192.168.0.15');
 
 var app = express();
 
-app.set('port', process.env.PORT || 3000);
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-app.use(favicon());
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
-app.use(cookieParser());
-app.use(require('stylus').middleware(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, 'public')));
+app.configure(function(){
+    app.set('port', process.env.PORT || 3000);
+    app.set('views', __dirname + '/views');
+    app.set('view engine', 'jade');
+    app.use(express.favicon());
+    app.use(express.logger('tiny'));
+    app.use(express.bodyParser());
+    app.use(express.methodOverride());
+    app.use(express.cookieParser('123456789987654321'));
+    app.use(express.session());
+    app.use(app.router);
+    app.use(require('stylus').middleware(__dirname + '/public'));
+    app.use(express.static(path.join(__dirname, 'public')));
+});
+
+app.configure('development', function(){
+    app.use(express.errorHandler());
+});
 
 var webserver = http.createServer(app).listen(app.get('port'), function(){
-	console.log("Express server listening on port " + app.get('port'));
+    console.log("Express server listening on port " + app.get('port'));
 });
+
+app.get('/', function (req, res) {
+    res.render('controller.jade', { title: 'Panasonic Camera Controller', commands: convertCommands2HTMLData(controller.commands) });
+});
+
+function convertCommands2HTMLData (commands) {
+    // convert commands to html input and output fields:
+
+    var items = [];
+
+    for (var i = 0; i < controller.commands.length; i++) {
+        var command = controller.commands[i];
+
+        var item = {
+            data: command,
+            html: {
+                control: {
+                    enabled: false,
+                    inputfields: []
+                },
+                confirmation: {
+                    enabled: false
+                },
+                outputfields: []
+            }
+        }
+
+        // is there a control input:
+        if(command.commands.control){
+            item.html.control.enabled = true;
+
+            // find the number of [Data]-occurences (these are inputs);
+            var match = command.commands.control.match(/\[Data\d*\]/g);
+            if(match){
+                for (var j = 0; j < match.length; j++) {
+                    // let's call this [Data1] the id for the inputfield:
+                    var id = match[j];
+
+                    // find values for that id:
+                    var values = command.values[id];
+
+                    item.html.control.inputfields.push({
+                        name: id,
+                        id: 'IN-'+id,
+                        values: values
+                    });
+                };
+            }
+        }
+
+        // is there a confirmation input:
+        if(command.commands.confirmation){
+            item.html.confirmation.enabled = true;
+        }
+
+        // what are the outputfields:
+        if(command.commands.response){
+            // find the number of [Data]-occurences (these are inputs);
+            var match = command.commands.response.match(/\[Data\d*\]/g);
+            if(match){
+                for (var j = 0; j < match.length; j++) {
+                    // let's call this [Data1] the id for the outputfield:
+                    var id = match[j];
+
+                    item.html.outputfields.push({
+                        name: id,
+                        id: 'OUT-'+id
+                    });
+                };
+            }
+        }
+
+        console.log( util.inspect(item, false, null, true) );
+
+        items.push(item);
+    };
+
+    return items;
+}
+
+app.get('/3d', function(req, res) {
+    res.render('3d.ejs', { title: '3D Studio' });
+});
+
 
 // Socket IO
 var io = socketio.listen(webserver);
 io.set('log level', 0);
-
-
-app.get('/', function (req, res) {
-	res.render('controller', { title: 'Panasonic Camera Controller' });
-});
-
-function convertCommands2HTMLData (commands) {
-	// convert commands to html input and output fields:
-
-	var items = [];
-
-	for (var i = 0; i < controller.commands.length; i++) {
-		var command = controller.commands[i];
-
-		var item = {
-			data: command,
-			html: {
-				control: {
-					enabled: false,
-					inputfields: []
-				},
-				confirmation: {
-					enabled: false
-				},
-				outputfields: []
-			}
-		}
-
-		// is there a control input:
-		if(command.commands.control){
-			item.html.control.enabled = true;
-
-			// find the number of [Data]-occurences (these are inputs);
-			var match = command.commands.control.match(/\[Data\d*\]/g);
-			if(match){
-				for (var j = 0; j < match.length; j++) {
-					// let's call this [Data1] the id for the inputfield:
-					var id = match[j];
-
-					// find values for that id:
-					var values = command.values[id];
-
-					item.html.control.inputfields.push({
-						id: 'IN-'+id,
-						values: values
-					});
-				};
-			}
-		}
-
-		// is there a confirmation input:
-		if(command.commands.confirmation){
-			item.html.confirmation.enabled = true;
-		}
-
-		// what are the outputfields:
-		if(command.commands.response){
-			// find the number of [Data]-occurences (these are inputs);
-			var match = command.commands.response.match(/\[Data\d*\]/g);
-			if(match){
-				for (var j = 0; j < match.length; j++) {
-					// let's call this [Data1] the id for the outputfield:
-					var id = match[j];
-
-					item.html.outputfields.push('OUT-'+id);
-				};
-			}
-		}
-
-		console.log( util.inspect(item, false, null, true) );
-
-		items.push(item);
-	};
-
-	return items;
-}
-
-app.get('/3d', function(req, res) {
-	res.render('3d', { title: '3D Studio' });
-});
 
 
 io.sockets.on('connection', function (socket) {
@@ -144,8 +153,6 @@ io.sockets.on('connection', function (socket) {
 		});
 	});
 });
-
-
 
 
 // simple tcp server:
