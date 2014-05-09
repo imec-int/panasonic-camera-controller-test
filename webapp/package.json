@@ -16,6 +16,7 @@
     "ejs": "~0.8.5",
     "stylus": "0.42.3",
     "socket.io": "^0.9.16",
-    "panasonic-camera-controller": "git://github.com/mixbe/panasonic-camera-controller"
+    "panasonic-camera-controller": "git://github.com/mixbe/panasonic-camera-controller",
+    "underscore": "^1.6.0"
   }
 }

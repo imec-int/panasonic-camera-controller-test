@@ -8,6 +8,9 @@ var bodyParser = require('body-parser');
 var socketio = require('socket.io');
 var net = require('net');
 var controller = require('panasonic-camera-controller');
+var _ = require('underscore');
+var util = require('util')
+
 
 var cam1 = new controller.Camera('192.168.0.12');
 var cam2 = new controller.Camera('192.168.0.15');
@@ -26,7 +29,7 @@ app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 var webserver = http.createServer(app).listen(app.get('port'), function(){
-    console.log("Express server listening on port " + app.get('port'));
+	console.log("Express server listening on port " + app.get('port'));
 });
 
 // Socket IO
@@ -34,12 +37,83 @@ var io = socketio.listen(webserver);
 io.set('log level', 0);
 
 
-app.get('/', function(req, res) {
-    res.render('controller', { title: 'Panasonic Camera Controller' });
+app.get('/', function (req, res) {
+	res.render('controller', { title: 'Panasonic Camera Controller' });
 });
 
+function convertCommands2HTMLData (commands) {
+	// convert commands to html input and output fields:
+
+	var items = [];
+
+	for (var i = 0; i < controller.commands.length; i++) {
+		var command = controller.commands[i];
+
+		var item = {
+			data: command,
+			html: {
+				control: {
+					enabled: false,
+					inputfields: []
+				},
+				confirmation: {
+					enabled: false
+				},
+				outputfields: []
+			}
+		}
+
+		// is there a control input:
+		if(command.commands.control){
+			item.html.control.enabled = true;
+
+			// find the number of [Data]-occurences (these are inputs);
+			var match = command.commands.control.match(/\[Data\d*\]/g);
+			if(match){
+				for (var j = 0; j < match.length; j++) {
+					// let's call this [Data1] the id for the inputfield:
+					var id = match[j];
+
+					// find values for that id:
+					var values = command.values[id];
+
+					item.html.control.inputfields.push({
+						id: 'IN-'+id,
+						values: values
+					});
+				};
+			}
+		}
+
+		// is there a confirmation input:
+		if(command.commands.confirmation){
+			item.html.confirmation.enabled = true;
+		}
+
+		// what are the outputfields:
+		if(command.commands.response){
+			// find the number of [Data]-occurences (these are inputs);
+			var match = command.commands.response.match(/\[Data\d*\]/g);
+			if(match){
+				for (var j = 0; j < match.length; j++) {
+					// let's call this [Data1] the id for the outputfield:
+					var id = match[j];
+
+					item.html.outputfields.push('OUT-'+id);
+				};
+			}
+		}
+
+		console.log( util.inspect(item, false, null, true) );
+
+		items.push(item);
+	};
+
+	return items;
+}
+
 app.get('/3d', function(req, res) {
-    res.render('3d', { title: '3D Studio' });
+	res.render('3d', { title: '3D Studio' });
 });
 
 
@@ -78,21 +152,21 @@ io.sockets.on('connection', function (socket) {
 var tcpport = 35202;
 var tcpserver = net.createServer(function (socket) {
 
-    console.log('tcp socket connected: ' + socket.remoteAddress);
+	console.log('tcp socket connected: ' + socket.remoteAddress);
 
-    socket.on('data', function (data) {
-        data = data.toString();
-        console.log('tcp data:', data);
-    });
+	socket.on('data', function (data) {
+		data = data.toString();
+		console.log('tcp data:', data);
+	});
 
 
-    socket.on('end', function () {
-        console.log('tcp socket disconnected');
-    });
+	socket.on('end', function () {
+		console.log('tcp socket disconnected');
+	});
 
-    socket.on('error', function (err) {
-        console.log(err);
-    });
+	socket.on('error', function (err) {
+		console.log(err);
+	});
 });
 
 tcpserver.listen(tcpport);
