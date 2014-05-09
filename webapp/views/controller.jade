@@ -12,7 +12,7 @@ html
   body
     h1 #{title}
     each val in [1, 2, 3, 4, 5]
-      button.preset.btn.btn-primary Preset #{val}
+      button.preset.btn.btn-primary(data-preset="#{val}") Preset #{val}
       | &nbsp;
 
     h2 Pan/Tilt absolute
