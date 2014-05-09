@@ -30,13 +30,20 @@ var ControllerApp = function (options){
 
 	var addHandlers = function () {
 		$('.preset').click( onPresetClick );
+
+		pantiltabsolute
+
+		$("#pantiltabsolute").submit(function(e){
+			e.preventDefault();
+			var pan = $("#pantiltabsolute #pan").val();
+			var tilt = $("#pantiltabsolute #tilt").val();
+
+			socket.emit('pantilt.absolute', {pan: pan, tilt: tilt});
+		});
 	};
 
 	var onPresetClick = function (event){
 		var preset = $(this).attr('data-preset');
-
-		console.log(preset);
-
 		socket.emit('preset.move', preset, function (data) {
 			console.log(data);
 		});

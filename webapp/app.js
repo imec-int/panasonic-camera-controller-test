@@ -44,27 +44,32 @@ app.get('/3d', function(req, res) {
 
 
 io.sockets.on('connection', function (socket) {
-    console.log('[' + socket.handshake.address.address + '] user connected');
+	console.log('[' + socket.handshake.address.address + '] user connected');
 
-    socket.on('preset.move', function (preset, socketCallback) {
+	socket.on('preset.move', function (preset, socketCallback) {
 
-        console.log("setting preset ", preset);
+		console.log("setting preset ", preset);
 
-        cam1.moveToPreset(preset, function (err, res) {
-            if(err) return console.log(err);
-            console.log(res);
-        });
+		cam1.moveToPreset(preset, function (err, res) {
+			if(err) return console.log(err);
+			console.log(res);
 
-        //respond immediately:
-        socketCallback();
-    });
+			//respond immediately:
+			socketCallback(res);
+		});
+	});
+
+
+	socket.on('pantilt.absolute', function (data) {
+		console.log('pantilt.absolute', data);
+
+
+		cam1.pantiltAbsolute(data.pan, data.tilt, function (err, res) {
+			if(err) return console.log(err);
+			console.log(res);
+		});
+	});
 });
-
-
-
-
-
-
 
 
 
