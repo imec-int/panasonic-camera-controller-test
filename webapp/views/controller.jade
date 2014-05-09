@@ -1,0 +1,63 @@
+doctype html5
+html
+  head
+    meta(name='viewport', content='initial-scale=1.0, user-scalable=no')
+    title #{title}
+    link(rel='stylesheet', type='text/css', href='//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css')
+    link(rel='stylesheet', href='/stylesheets/controller.css')
+    script(type='text/javascript', src='/socket.io/socket.io.js')
+    script(type='text/javascript', src='/vendor/jquery-1.11.0.min.js')
+    script(type='text/javascript', src='/vendor/fastclick.js')
+    script(type='text/javascript', src='/javascripts/controller.js')
+  body
+    h1 #{title}
+    each val in [1, 2, 3, 4, 5]
+      button.preset.btn.btn-primary Preset #{val}
+      | &nbsp;
+
+    h2 Pan/Tilt absolute
+    form#pantiltabsolute.form-horizontal(role='form')
+      .form-group
+        label.col-sm-2.control-label(for='pan') Pan (degrees, between -180° and +180°)
+        .col-sm-10
+          input#pan.form-control(type='number', value='0')
+      .form-group
+        label.col-sm-2.control-label(for='tilt') Tilt (degrees, between -90° and +90°)
+        .col-sm-10
+          input#tilt.form-control(type='number', value='0')
+      .form-group
+        .col-sm-offset-2.col-sm-10
+          button.btn.btn-default(type='submit') Set Camera position
+
+    h2 Auto generated controls
+    form#commands.form-horizontal(role='form')
+    each command in commands
+      h4 #{command.data.item}
+      if command.html.control.enabled
+        h5 control
+        each inputfield in command.html.control.inputfields
+          label.col-sm-2.control-label(for='tilt') #{inputfield.name}
+          .col-sm-10
+            if inputfield.values.type == 'range'
+              input.form-control(type='text')
+            else
+              select.form-control
+                each valuetext, value in inputfield.values
+                  option(value="#{value}") #{valuetext}
+        button.btn.btn-success Set
+
+
+      if command.html.confirmation.enabled
+        button.confirm.btn.btn-info Confirm
+
+      if command.html.outputfields
+        h5 response
+        each outputfield in command.html.outputfields
+          label.col-sm-2.control-label(for='tilt') #{outputfield.name}
+          .col-sm-10
+            input.form-control(id="#{outputfield.id}", type='number')
+      br
+      br
+      hr
+
+
