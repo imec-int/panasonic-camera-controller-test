@@ -38,11 +38,12 @@ require([
 			camController["Left"] = goo.world.by.name('Cam_Left').first();
 			console.log("Cams loaded");
 			console.log(camController);
-			// console.log(camController["Front"].scriptComponent.scripts[0].parameters.speed);
+
 
 			// console.log(camController["Front"].getRotation().data);
 			showCameraInfo(camController["Front"]);
 			activeCamId = 'Front';
+
 			/*
 			To get a hold of entities, one can use the World's selection functions:
 			var allEntities = gooRunner.world.getEntities();                  // all
