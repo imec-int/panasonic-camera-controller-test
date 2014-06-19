@@ -44,6 +44,8 @@ var ControllerApp = function (options){
 		});
 
 		$(".set").click( onSetClick );
+
+		$('.slider').slider();
 	};
 
 	var onPresetClick = function (event){
@@ -55,11 +57,11 @@ var ControllerApp = function (options){
 
 	var onSetClick = function (event) {
 		var form = $(this).closest("form");
-		var item = form.attr('data-item');
+		var name = form.attr('data-name');
 
 		// gather all inputs:
 		var command = {
-			item: item,
+			name: name,
 			inputs: {}
 		};
 		form.find(":input").each(function(){
@@ -71,7 +73,7 @@ var ControllerApp = function (options){
 			}
 		});
 
-		socket.emit('command.control', command, function (data) {
+		socket.emit('command', command, function (data) {
 			console.log(data);
 			for(var key in data){
 				var value = data[key];

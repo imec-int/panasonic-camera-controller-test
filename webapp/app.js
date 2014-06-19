@@ -6,13 +6,13 @@ var path = require('path');
 var socketio = require('socket.io');
 var net = require('net');
 var _ = require('underscore');
-var util = require('util')
+var util = require('util');
 
 var controller = require('panasonic-camera-controller');
-var cam1 = new controller.Camera('192.168.0.12');
-var cam2 = new controller.Camera('192.168.0.15');
+var cam1 = new controller.Camera('10.32.206.37');
+var cam2 = new controller.Camera('10.32.206.38'); // 10.32.206.39
 
-var maincam = cam1;
+var maincam = cam2;
 
 var app = express();
 
@@ -49,68 +49,54 @@ function convertCommands2HTMLData (commands) {
 	var items = [];
 
 	for (var i = 0; i < controller.commands.length; i++) {
-		var command = controller.commands[i];
+		var cmd = controller.commands[i];
 
 		var item = {
-			data: command,
+			cmd: cmd,
 			html: {
-				control: {
-					enabled: false,
-					inputfields: []
-				},
-				confirmation: {
-					enabled: false
-				},
+				inputfields: [],
 				outputfields: []
 			}
 		}
 
-		// is there a control input:
-		if(command.commands.control){
-			item.html.control.enabled = true;
 
-			// find the number of [Data]-occurences (these are inputs);
-			var match = command.commands.control.match(/\[Data\d*\]/g);
-			if(match){
-				for (var j = 0; j < match.length; j++) {
-					// let's call this [Data1] the id for the inputfield:
-					var id = match[j];
+		// find the number of [Data]-occurences (these are inputs);
+		var match = cmd.input.match(/\[Data\d*\]/g);
+		if(match){
+			for (var j = 0; j < match.length; j++) {
+				// let's call this [Data1] the id for the inputfield:
+				var id = match[j];
 
-					// find values for that id:
-					var values = command.values[id];
+				// find values for that id:
+				var values = cmd.values[id];
 
-					item.html.control.inputfields.push({
-						name: id,
-						id: id,
-						values: values
-					});
-				};
-			}
+				item.html.inputfields.push({
+					name: id.replace(/\[|\]/g, ''), // removed the '[' and ']'
+					id: id,
+					values: values
+				});
+			};
 		}
 
-		// is there a confirmation input:
-		if(command.commands.confirmation){
-			item.html.confirmation.enabled = true;
-		}
 
 		// what are the outputfields:
-		if(command.commands.response){
+		if(cmd.output){
 			// find the number of [Data]-occurences (these are inputs);
-			var match = command.commands.response.match(/\[Data\d*\]/g);
+			var match = cmd.output.match(/\[Data\d*\]/g);
 			if(match){
 				for (var j = 0; j < match.length; j++) {
 					// let's call this [Data1] the id for the outputfield:
 					var id = match[j];
 
 					item.html.outputfields.push({
-						name: id,
+						name: id.replace(/\[|\]/g, ''), // removed the '[' and ']'
 						id: id
 					});
 				};
 			}
 		}
 
-		// console.log( util.inspect(item, false, null, true) );
+		console.log( util.inspect(item, false, null, true) );
 
 		items.push(item);
 	};
@@ -155,31 +141,31 @@ io.sockets.on('connection', function (socket) {
 		});
 	});
 
-	socket.on('command.control', function (data, socketCallback) {
+	socket.on('command', function (data, socketCallback) {
 
 		// console.log("data ", data);
 
-		var command = _.find(controller.commands, function (command) {
-			return command.item == data.item;
+		var cmd = _.find(controller.commands, function (cmd) {
+			return cmd.name == data.name; // TODO: add type to be sure
 		});
 
-		// console.log(command);
+		// console.log(cmd);
 
-		var controlcommand = command.commands.control;
+		var input = cmd.input;
 
 		for(var key in data.inputs){
 			var value = data.inputs[key];
 
 			// console.log("key", key, "value", value);
 
-			controlcommand = controlcommand.replace(key, value);
+			input = input.replace(key, value);
 		}
 
-		// console.log("controlcommand", controlcommand);
+		// console.log("input", input);
 
 
-		if(command.type == "pt"){
-			maincam.sendPtCommand(controlcommand, function (err, res) {
+		if(cmd.type == "pt"){
+			maincam.sendPtCommand(input, function (err, res) {
 				if(err) return console.log(err);
 				console.log(res);
 
@@ -189,8 +175,8 @@ io.sockets.on('connection', function (socket) {
 		}
 
 
-		if(command.type == "camera"){
-			maincam.sendCameraCommand(controlcommand, function (err, res) {
+		if(cmd.type == "camera"){
+			maincam.sendCameraCommand(input, function (err, res) {
 				if(err) return console.log(err);
 				console.log(res);
 
@@ -229,5 +215,9 @@ var tcpserver = net.createServer(function (socket) {
 
 tcpserver.listen(tcpport);
 console.log('TCP server listening on port ' + tcpport);
+
+
+
+
 
 

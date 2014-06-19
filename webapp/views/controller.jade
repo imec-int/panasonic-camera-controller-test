@@ -1,63 +1,65 @@
 doctype html5
 html
-  head
-    meta(name='viewport', content='initial-scale=1.0, user-scalable=no')
-    title #{title}
-    link(rel='stylesheet', type='text/css', href='//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css')
-    link(rel='stylesheet', href='/stylesheets/controller.css')
-    script(type='text/javascript', src='/socket.io/socket.io.js')
-    script(type='text/javascript', src='/vendor/jquery-1.11.0.min.js')
-    script(type='text/javascript', src='/vendor/fastclick.js')
-    script(type='text/javascript', src='/javascripts/controller.js')
-  body
-    h1 #{title}
-    each val in [1, 2, 3, 4, 5]
-      button.preset.btn.btn-primary(data-preset="#{val}") Preset #{val}
-      | &nbsp;
+	head
+		meta(name='viewport', content='initial-scale=1.0, user-scalable=no')
+		title #{title}
+		link(rel='stylesheet', type='text/css', href='//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css')
+		link(rel='stylesheet', href='/stylesheets/controller.css')
+		script(type='text/javascript', src='/socket.io/socket.io.js')
+		script(type='text/javascript', src='/vendor/jquery-1.11.0.min.js')
+		script(type='text/javascript', src='/vendor/fastclick.js')
 
-    h2 Pan/Tilt absolute
-    form#pantiltabsolute.form-horizontal(role='form')
-      .form-group
-        label.col-sm-2.control-label(for='pan') Pan (degrees, between -180° and +180°)
-        .col-sm-10
-          input#pan.form-control(type='number', value='0')
-      .form-group
-        label.col-sm-2.control-label(for='tilt') Tilt (degrees, between -90° and +90°)
-        .col-sm-10
-          input#tilt.form-control(type='number', value='0')
-      .form-group
-        .col-sm-offset-2.col-sm-10
-          button.btn.btn-default(type='submit') Set Camera position
+		link(rel='stylesheet', href='/vendor/slider/css/slider.css')
+		script(type='text/javascript', src='/vendor/slider/js/bootstrap-slider.js')
+
+		script(type='text/javascript', src='/javascripts/controller.js')
+	body
+		h1 #{title}
+		each val in [1, 2, 3, 4, 5]
+			button.preset.btn.btn-primary(data-preset="#{val}") Preset #{val}
+			| &nbsp;
+
+		h2 Pan/Tilt absolute
+		form#pantiltabsolute.form-horizontal(role='form')
+			.form-group
+				label.col-sm-2.control-label(for='pan') Pan (degrees, between -180° and +180°)
+				.col-sm-10
+					input#pan.form-control(type='number', value='0')
+			.form-group
+				label.col-sm-2.control-label(for='tilt') Tilt (degrees, between -90° and +90°)
+				.col-sm-10
+					input#tilt.form-control(type='number', value='0')
+			.form-group
+				.col-sm-offset-2.col-sm-10
+					button.btn.btn-default(type='submit') Set Camera position
 
 
-    h2 Auto generated controls
-    each command in commands
-      form.autocommand.form-horizontal(data-item="#{command.data.item}", role='form')
-        h4 #{command.data.item}
-        if command.html.control.enabled
-          h5 control
-          each inputfield in command.html.control.inputfields
-            label.col-sm-2.control-label(for='tilt') #{inputfield.name}
-            .col-sm-10
-              if inputfield.values.type == 'range'
-                input.form-control(data-controlid="#{inputfield.id}", type='text')
-              else
-                select.form-control(data-controlid="#{inputfield.id}")
-                  each valuetext, value in inputfield.values
-                    option(value="#{value}") #{valuetext}
-          button.set.btn.btn-success Set
+		h2 Auto generated controls
+		each command in commands
+			form.autocommand.form-horizontal(data-name="#{command.cmd.name}", role='form')
+				h4 #{command.cmd.name}
+				if command.html.inputfields
+					h5 input
+					each inputfield in command.html.inputfields
+						label.col-sm-2.control-label(for='tilt') #{inputfield.name}
+						.col-sm-10
+							if inputfield.values.type == 'linear'
+								//- input.form-control.span2.slider(data-controlid="#{inputfield.id}", type='text', value='', data-slider-min='-20', data-slider-max='20', data-slider-step='1', data-slider-value='-14', data-slider-orientation='horizontal', data-slider-selection='after', data-slider-tooltip='show')
+								input.form-control(data-controlid="#{inputfield.id}", type='text')
+							else if inputfield.values.type == 'discrete'
+								select.form-control(data-controlid="#{inputfield.id}")
+									each codetext, code in inputfield.values.codes
+										option(value="#{code}") #{codetext}
+					button.set.btn.btn-success Set
 
-        if command.html.confirmation.enabled
-          button.confirm.btn.btn-info Confirm
-
-        if command.html.outputfields
-          h5 response
-          each outputfield in command.html.outputfields
-            label.col-sm-2.control-label(for='tilt') #{outputfield.name}
-            .col-sm-10
-              input.outputfield.form-control(data-outputid="#{outputfield.id}", type='text', disabled="disabled")
-        br
-        br
-        hr
+				if command.html.outputfields
+					h5 output
+					each outputfield in command.html.outputfields
+						label.col-sm-2.control-label(for='tilt') #{outputfield.name}
+						.col-sm-10
+							input.outputfield.form-control(data-outputid="#{outputfield.id}", type='text', disabled="disabled")
+				br
+				br
+				hr
 
 
